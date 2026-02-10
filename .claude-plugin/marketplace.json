@@ -1,4 +1,5 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "specsmith-forge",
   "owner": {
     "name": "Gabriel Voicu"
@@ -6,7 +7,7 @@
   "plugins": [
     {
       "name": "spec-smith",
-      "source": ".",
+      "source": "./",
       "description": "Structured spec management for AI coding workflows. Replaces ephemeral plans with persistent, resumable specs built through deep research and iterative interviews.",
       "version": "0.1.0",
       "author": {
