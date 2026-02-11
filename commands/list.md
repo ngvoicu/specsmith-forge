@@ -1,5 +1,7 @@
-| description | List all specs with status, progress, and priority |
-| disable-model-invocation | true |
+---
+description: List all specs with status, progress, and priority
+disable-model-invocation: true
+---
 
 # List Specs
 

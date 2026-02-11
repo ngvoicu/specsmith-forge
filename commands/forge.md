@@ -1,5 +1,7 @@
-| description | Research deeply, interview the user, then forge a structured spec with phases and tasks. This is your enhanced plan mode. |
-| disable-model-invocation | true |
+---
+description: Research deeply, interview the user, then forge a structured spec with phases and tasks. This is your enhanced plan mode.
+disable-model-invocation: true
+---
 
 # Forge a Spec
 

@@ -1,5 +1,7 @@
-| description | Resume the active spec — read progress, load context, pick up where you left off |
-| disable-model-invocation | true |
+---
+description: Resume the active spec — read progress, load context, pick up where you left off
+disable-model-invocation: true
+---
 
 # Resume Spec
 

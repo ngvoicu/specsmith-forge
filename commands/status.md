@@ -1,5 +1,7 @@
-| description | Show detailed progress of the active spec |
-| disable-model-invocation | true |
+---
+description: Show detailed progress of the active spec
+disable-model-invocation: true
+---
 
 # Spec Status
 

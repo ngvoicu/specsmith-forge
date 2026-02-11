@@ -1,5 +1,7 @@
-| description | Switch to a different spec — pause current, activate and resume target |
-| disable-model-invocation | true |
+---
+description: Switch to a different spec — pause current, activate and resume target
+disable-model-invocation: true
+---
 
 # Switch Spec
 

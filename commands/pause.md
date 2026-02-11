@@ -1,5 +1,7 @@
-| description | Pause the active spec — save detailed resume context for next session |
-| disable-model-invocation | true |
+---
+description: Pause the active spec — save detailed resume context for next session
+disable-model-invocation: true
+---
 
 # Pause Spec
 
