@@ -9,7 +9,7 @@
       "name": "spec-smith",
       "source": "./",
       "description": "Structured spec management for AI coding workflows. Replaces ephemeral plans with persistent, resumable specs built through deep research and iterative interviews.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Gabriel Voicu"
       },

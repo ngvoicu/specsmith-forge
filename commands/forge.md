@@ -9,15 +9,15 @@ with something far more thorough: deep research → interview → more research
 
 The user's request: $ARGUMENTS
 
-## Setup
+## Plan Mode Check
 
-1. Generate a spec ID from the user's request (lowercase, hyphenated)
-2. Create the research directory:
-   ```
-   mkdir -p .specs/research/<spec-id>
-   mkdir -p .specs/specs/<spec-id>
-   ```
-3. If `.specs/` doesn't exist yet, also create `registry.md` and `active`
+Before starting, check if you're in plan mode (read-only). If so:
+- Skip the Setup phase (directory creation) — we'll do it later
+- Proceed directly to Phase 1 (research) and Phase 2+ (interviews)
+- When reaching Phase 5 (write spec), ask the user to exit plan mode
+  first, then do Setup + write spec
+
+If NOT in plan mode, proceed normally with Setup first.
 
 ## Phase 1: Deep Research
 
@@ -182,6 +182,22 @@ Save each round to `interview-02.md`, `interview-03.md`, etc.
 - Every task in the spec can be described concretely (not "figure out X")
 
 It's fine if this takes 2 rounds or 5 rounds. Don't rush it.
+
+## Setup (before writing)
+
+Before writing the spec, ensure the directory structure exists:
+
+1. Generate a spec ID from the user's request (lowercase, hyphenated)
+2. Create the research directory:
+   ```
+   mkdir -p .specs/research/<spec-id>
+   mkdir -p .specs/specs/<spec-id>
+   ```
+3. If `.specs/` doesn't exist yet, also create `registry.md` and `active`
+
+If you were in plan mode during earlier phases, confirm the user has exited
+plan mode before proceeding. If directory creation fails (still read-only),
+ask the user to exit plan mode (Shift+Tab) and wait for confirmation.
 
 ## Phase 5: Write the Spec
 

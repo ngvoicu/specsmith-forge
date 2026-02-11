@@ -123,6 +123,11 @@ as the Cursor section above.
 Aider uses `.aider.conf.yml` or reads from conventions files. Create a
 `.aider/conventions.md` with the Cursor snippet above.
 
+## Gemini CLI
+
+Gemini CLI uses `GEMINI.md` for project instructions. Add the same
+content as the Cursor section above.
+
 ## Any Other Tool
 
 If your tool has a project-level instruction file (most do), add the

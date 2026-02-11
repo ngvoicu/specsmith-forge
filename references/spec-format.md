@@ -24,6 +24,16 @@ tags: [<tag1>, <tag2>]
 enough context that someone resuming cold can understand the goal without
 reading the full conversation history.>
 
+## Requirements
+
+- <When X happens, the system shall Y>
+- <The Z component shall do W>
+- [NEEDS CLARIFICATION] <Ambiguous requirement that needs discussion>
+
+Requirements are lightweight acceptance criteria — what "done" looks like.
+Not every spec needs them (skip for small bug fixes), but for features
+they prevent scope creep and make verification clear.
+
 ## Phase 1: <Phase Name> [in-progress]
 
 - [x] <Completed task description>
@@ -106,6 +116,19 @@ Only one task should have this marker at a time.
 **Task granularity**: Each task should represent roughly one focused work
 session (30 min to 2 hours of work). If a task feels like it would take a
 full day, break it into subtasks.
+
+### Uncertainty Markers
+
+Use `[NEEDS CLARIFICATION]` for any requirement or task where ambiguity
+remains after interviews:
+
+```markdown
+- [ ] [NEEDS CLARIFICATION] Handle rate limiting for uploads
+```
+
+These markers signal that the task needs more discussion before
+implementation. Don't start a task with this marker — resolve it first
+(run another interview round or ask the user directly).
 
 ### Resume Context
 

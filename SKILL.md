@@ -37,6 +37,26 @@ Instead of a quick scan and a plan, it does exhaustive research, interviews
 the user in multiple rounds, stores everything, then writes a spec where
 every task is concrete and unambiguous.
 
+## Plan Mode Handling
+
+The `/forge` workflow bypasses Claude Code's built-in plan mode — it IS the
+planning phase. However, users might invoke forge while already in plan mode.
+
+**If you detect you're in plan mode (read-only, can't write files):**
+
+1. Tell the user: "You're in plan mode. Research and interviews work fine
+   here since they're read-only. When we're ready to write the spec and
+   implement, I'll need you to exit plan mode (Shift+Tab)."
+2. Proceed with research and interviews normally (Phases 1-4)
+3. When reaching Phase 5 (write spec), remind the user: "We're ready to
+   write the spec. Please exit plan mode (Shift+Tab) so I can create the
+   spec files."
+4. Wait for the user to confirm they've exited plan mode before writing
+
+This means forge works in ANY permission mode — it adapts. The research
+and interview phases are naturally read-only. Only spec writing and
+implementation need write access.
+
 ## How Forge Works (The Enhanced Plan Mode)
 
 The forge workflow replaces Claude Code's plan mode with something far more

@@ -109,6 +109,44 @@ API. Uses the existing middleware pattern in src/middleware/.
 
 ## Installation
 
+### CLI (Any Terminal)
+
+SpecSmith CLI works standalone from any terminal, with any AI tool, or no AI at all.
+
+```bash
+# Core CLI
+pipx install specsmith
+
+# With AI-assisted spec generation
+pipx install "specsmith[ai]"
+```
+
+Quick start:
+
+```bash
+specsmith init                        # Initialize .specs/ in your project
+specsmith new "User Auth System"      # Create a new spec
+specsmith status                      # Show progress
+specsmith list                        # List all specs
+specsmith pause                       # Pause current spec
+specsmith switch other-spec-id        # Switch to another spec
+specsmith setup cursor                # Configure a tool
+specsmith forge "add auth"            # AI-assisted spec creation
+```
+
+See the full [CLI documentation](cli/README.md) for all commands and options.
+
+## Plan Mode
+
+SpecSmith **bypasses** Claude Code's built-in plan mode. The `/forge`
+command IS your planning phase — deep research, interviews, spec writing.
+You don't need plan mode at all.
+
+If you happen to be in plan mode when you run `/forge`, it still works:
+- Research and interviews are read-only and run fine
+- When it's time to write the spec, you'll be asked to exit plan mode
+  (Shift+Tab) so files can be created
+
 ### Claude Code (Full Plugin — Recommended)
 
 Installs everything: `/forge`, `/resume`, `/pause`, `/switch`, `/list`, `/status` commands, the researcher agent, session hooks, and the core skill.
