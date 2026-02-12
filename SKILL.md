@@ -22,42 +22,18 @@ with any AI coding tool that can read markdown.
 
 ## Claude Code Plugin
 
-If you're running as a Claude Code plugin, use these commands for the full
-experience:
-
-| Command | What it does |
-|---------|-------------|
-| `/spec-smith:forge <description>` | **The main workflow.** Deep research -> interview -> more research -> more interview -> write spec -> implement. This replaces plan mode. |
-| `/spec-smith:resume` | Resume the active spec from where you left off |
-| `/spec-smith:pause` | Pause the active spec with detailed resume context |
-| `/spec-smith:switch <id>` | Switch to a different spec (pauses current) |
-| `/spec-smith:list` | List all specs with status and progress |
-| `/spec-smith:status` | Detailed progress of the active spec |
-| `/spec-smith:openapi` | Scan the project and generate/update `.openapi/openapi.yaml` + per-endpoint docs in `.openapi/endpoints/` |
-
-The `/forge` command is the key innovation — it's what plan mode should be.
-Instead of a quick scan and a plan, it does exhaustive research, interviews
-the user in multiple rounds, stores everything, then writes a spec where
-every task is concrete and unambiguous. See `commands/forge.md` for the
-full workflow.
-
-**Plan mode handling:** The forge workflow bypasses built-in plan mode — it
-IS the planning phase. If you're in plan mode (read-only), research and
-interviews still work. When it's time to write the spec, ask the user to
-exit plan mode so files can be created.
+If running as a Claude Code plugin, slash commands like `/spec-smith:forge`,
+`/spec-smith:resume`, `/spec-smith:pause` etc. are available. See the
+plugin's `commands/` directory for the full set. The `/forge` command
+replaces plan mode with deep research, iterative interviews, and spec
+writing.
 
 ## Session Start
 
-When running as a Claude Code plugin, the session hook automatically injects
-a rich summary of the active spec (title, progress, current phase/task, and
-resume context) into `additionalContext`. If you see this injected context,
-use it directly — no need to read files again. Just greet with a brief note
-like "You have an active spec" and let the user decide what to do.
+If active-spec context was injected by a session hook, use it directly
+instead of reading files. Otherwise, fall back to reading files manually:
 
-When running as a standalone skill (no plugin / no hook-injected context),
-fall back to reading files manually:
-
-1. Read `.specs/active` to check for an active spec
+1. Read `.specs/registry.md` to check for a spec with `active` status
 2. If one exists, briefly mention it:
    "You have an active spec: **User Auth System** (5/12 tasks, Phase 2).
    Say 'resume' to pick up where you left off."
@@ -69,7 +45,7 @@ fall back to reading files manually:
 
 When the user says "resume", "what was I working on", or similar:
 
-1. Read `.specs/active` — if empty, list specs and ask which to resume
+1. Read `.specs/registry.md` — find the spec with `active` status. If none, list specs and ask which to resume
 2. Load `.specs/specs/<id>/SPEC.md`
 3. Parse progress:
    - Count completed `[x]` vs total tasks per phase
@@ -91,16 +67,24 @@ When the user says "resume", "what was I working on", or similar:
 
 ### Implementing
 
-While working through a spec's tasks:
+**After completing each task, immediately edit the SPEC.md file** to record
+progress. Do not wait until the end of a session or until asked — update the
+spec as you go:
 
-- Check off tasks proactively as you complete them: `- [ ]` -> `- [x]`
-- Move the `← current` marker to the next task
-- When all tasks in a phase are done:
-  - Phase status: `[in-progress]` -> `[completed]`
-  - Next phase: `[pending]` -> `[in-progress]`
+1. Check off the completed task: `- [ ]` -> `- [x]`
+2. Move `← current` to the next unchecked task
+3. When all tasks in a phase are done:
+   - Phase status: `[in-progress]` -> `[completed]`
+   - Next phase: `[pending]` -> `[in-progress]`
+4. Update the `updated` date in YAML frontmatter
+5. Update progress (`X/Y`) and `updated` date in `.specs/registry.md`
+
+Also:
 - If a task is more complex than expected, split it into subtasks
 - Update resume context at natural pauses
 - Log non-obvious technical decisions to the Decision Log
+- If implementation diverges from the spec (errors found, better approach
+  discovered, assumptions proved wrong), log it in the **Deviations** section
 
 ### Pausing
 
@@ -129,8 +113,7 @@ hooked up to the `/auth/refresh` endpoint yet."
 
 1. Pause the current spec (full pause workflow)
 2. Load the target spec
-3. Write target ID to `.specs/active`
-4. Set target status to `active` in its frontmatter
+3. Set target status to `active` in its frontmatter and in `.specs/registry.md`
 5. Resume the target spec (full resume workflow)
 
 ## Spec Format
@@ -148,9 +131,12 @@ Status values: `active`, `paused`, `completed`, `archived`
 
 ### Task Markers
 
-- `- [ ]` unchecked, `- [x]` done
+- `- [ ] [CODE-01]` unchecked, `- [x] [CODE-01]` done
+- Task codes: `<PREFIX>-<NN>` — prefix is a short (2-4 letter) uppercase
+  abbreviation of the spec (e.g., `user-auth-system` → `AUTH`). Numbers
+  auto-increment across all phases starting at `01`
 - `← current` after the task text marks the active task
-- `[NEEDS CLARIFICATION]` prefix on unclear tasks
+- `[NEEDS CLARIFICATION]` after the task code on unclear tasks
 
 ### Resume Context
 
@@ -161,6 +147,12 @@ next step. This is what makes cross-session continuity work.
 
 Markdown table with date, decision, and rationale columns. Log non-obvious
 technical choices (library selection, architecture pattern, API design).
+
+### Deviations
+
+Markdown table tracking where implementation diverged from the spec:
+task, what the spec said, what was actually done, and why. Only log
+changes that would surprise someone comparing the spec to the code.
 
 See `references/spec-format.md` for the full SPEC.md template.
 
@@ -178,11 +170,18 @@ When asked to plan or spec out work:
    - YAML frontmatter (id, title, status, created, updated, priority, tags)
    - Overview section (2-4 sentences on what and why)
    - Phases with status markers (3-6 phases is typical)
-   - Tasks as markdown checkboxes within each phase
+   - Tasks as markdown checkboxes with task codes (`[PREFIX-NN]`)
    - Resume Context section (blockquote)
    - Decision Log table
-4. Update `.specs/registry.md` (create if missing)
-5. Write the ID to `.specs/active`
+   - Deviations table (empty — filled during implementation)
+4. Update `.specs/registry.md` — set status to `active`. If creating for the
+   first time, initialize with:
+   ```markdown
+   # Spec Registry
+
+   | ID | Title | Status | Priority | Progress | Updated |
+   |----|-------|--------|----------|----------|---------|
+   ```
 
 **Phase/task guidelines:**
 - Each task should be completable in roughly one focused session
@@ -203,8 +202,7 @@ All state lives in `.specs/` at the project root:
 
 ```
 .specs/
-├── active                    # Plain text file containing active spec ID
-├── registry.md               # Table of all specs with status
+├── registry.md               # Table of all specs with status (single source of truth)
 ├── research/
 │   └── <spec-id>/
 │       ├── research-01.md    # Deep research findings
@@ -222,13 +220,16 @@ All state lives in `.specs/` at the project root:
 ```markdown
 # Spec Registry
 
-| ID | Title | Status | Priority | Updated |
-|----|-------|--------|----------|---------|
-| user-auth-system | User Auth System | active | high | 2026-02-10 |
-| api-refactor | API Refactoring | paused | medium | 2026-02-09 |
+| ID | Title | Status | Priority | Progress | Updated |
+|----|-------|--------|----------|----------|---------|
+| user-auth-system | User Auth System | active | high | 5/12 | 2026-02-10 |
+| api-refactor | API Refactoring | paused | medium | 2/8 | 2026-02-09 |
 ```
 
-Always keep this in sync when creating, pausing, completing, or archiving.
+**SPEC.md frontmatter is authoritative.** The registry is a denormalized
+index for quick lookups. Always update both together — when you change
+status, progress, or dates in SPEC.md, immediately mirror those changes
+in the registry. If they ever conflict, SPEC.md wins.
 
 ## Listing Specs
 
@@ -248,10 +249,30 @@ Completed:
 ## Completing a Spec
 
 1. Verify all tasks are checked (warn if not, but allow override)
-2. Set status to `completed` in frontmatter
-3. Update registry
-4. Clear `.specs/active` if this was active
-5. Suggest next spec to activate if any are paused
+2. Set status to `completed` in frontmatter and registry
+3. Update the `updated` date in both
+4. Suggest next spec to activate if any are paused
+
+## Archiving a Spec
+
+Archive completed specs to keep the registry clean:
+
+1. Set status to `archived` in frontmatter and registry
+2. Research files in `.specs/research/<id>/` can optionally be deleted
+   (the SPEC.md has all the decisions and context)
+
+Specs can be archived from `completed` or `paused` status. To reactivate
+an archived spec, set its status back to `active`.
+
+## Deleting a Spec
+
+To remove a spec entirely:
+
+1. Delete `.specs/specs/<id>/` (the SPEC.md)
+2. Delete `.specs/research/<id>/` if it exists
+3. Remove the row from `.specs/registry.md`
+
+This is irreversible — consider archiving instead if you might need it later.
 
 ## Cross-Tool Compatibility
 

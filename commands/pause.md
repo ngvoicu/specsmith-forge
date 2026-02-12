@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 Read the spec-smith skill and follow the "Pausing a Spec" workflow.
 
-1. Read `.specs/active` to find the active spec
+1. Read `.specs/registry.md` to find the spec with `active` status
 2. Load the SPEC.md
 3. Capture everything about the current state:
    - Which task was in progress

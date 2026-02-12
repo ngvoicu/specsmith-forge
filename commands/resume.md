@@ -7,9 +7,8 @@ disable-model-invocation: true
 
 Read the spec-smith skill and follow the "Resuming a Spec" workflow.
 
-1. Read `.specs/active` to find the active spec ID
-2. If empty, read `.specs/registry.md` and show the user their specs so
-   they can choose one
+1. Read `.specs/registry.md` to find the spec with `active` status
+2. If none is active, show the user their specs so they can choose one
 3. Load `.specs/specs/<id>/SPEC.md`
 4. Parse progress — count completed vs total tasks per phase
 5. Find the current phase and current task (`← current` marker)

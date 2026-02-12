@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # session-start.sh — Rich context injection for SpecSmith Forge
-# Reads the active spec and outputs a human-readable summary.
+# Reads the registry to find the active spec and outputs a human-readable summary.
 # Called by hooks.json on SessionStart (startup, resume, clear, compact).
 # Exits 0 silently if no active spec exists.
 
@@ -13,14 +13,22 @@ SPECS_DIR=".specs"
 # No .specs directory
 [ -d "$SPECS_DIR" ] || exit 0
 
-ACTIVE_FILE="$SPECS_DIR/active"
+REGISTRY="$SPECS_DIR/registry.md"
 
-# No active file or empty
-[ -f "$ACTIVE_FILE" ] && [ -s "$ACTIVE_FILE" ] || exit 0
+# No registry file
+[ -f "$REGISTRY" ] || exit 0
 
-SPEC_ID="$(tr -d '[:space:]' < "$ACTIVE_FILE")"
+# Find the active spec ID from the registry table (Status column = active)
+SPEC_ID="$(awk -F'|' '
+  NR <= 2 { next }
+  {
+    gsub(/^[ \t]+|[ \t]+$/, "", $2)
+    gsub(/^[ \t]+|[ \t]+$/, "", $4)
+    if (tolower($4) == "active") { print $2; exit }
+  }
+' "$REGISTRY")"
 
-# Empty after trimming
+# No active spec
 [ -n "$SPEC_ID" ] || exit 0
 
 SPEC_FILE="$SPECS_DIR/specs/$SPEC_ID/SPEC.md"
@@ -51,9 +59,9 @@ STATUS="$(frontmatter_val status)"
 
 PRIORITY="$(frontmatter_val priority)"
 
-# Task counts
-COMPLETED="$(grep -c '^- \[x\]' "$SPEC_FILE" || true)"
-UNCOMPLETED="$(grep -c '^- \[ \]' "$SPEC_FILE" || true)"
+# Task counts — only within phase sections, stop at Resume Context
+COMPLETED="$(awk '/^## Resume Context/ {exit} /^## Phase/ {in_phase=1} in_phase && /^- \[x\]/ {c++} END {print c+0}' "$SPEC_FILE")"
+UNCOMPLETED="$(awk '/^## Resume Context/ {exit} /^## Phase/ {in_phase=1} in_phase && /^- \[ \]/ {c++} END {print c+0}' "$SPEC_FILE")"
 TOTAL=$((COMPLETED + UNCOMPLETED))
 
 # Current phase: first "## Phase" line containing [in-progress]
@@ -62,11 +70,12 @@ CURRENT_PHASE="$(grep -m1 '^## Phase.*\[in-progress\]' "$SPEC_FILE" | sed 's/^##
 # Current task: line containing "← current"
 CURRENT_TASK="$(grep -m1 '← current' "$SPEC_FILE" | sed 's/^- \[.\] //' | sed 's/ *← current.*//' || true)"
 
-# Resume context: blockquote lines after "## Resume Context" heading (up to 5 lines)
+# Resume context: blockquote lines after "## Resume Context" heading
+# Capped at 10 lines to keep the session start summary concise
 RESUME_CONTEXT="$(awk '
   /^## Resume Context/ { found=1; next }
   found && /^## / { exit }
-  found && /^>/ { sub(/^> ?/, ""); print; count++; if (count>=5) exit }
+  found && /^>/ { sub(/^> ?/, ""); print; count++; if (count>=10) exit }
 ' "$SPEC_FILE")"
 
 # --- Build output ---

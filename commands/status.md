@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 Show detailed progress of the active spec.
 
-1. Read `.specs/active` to find active spec ID
+1. Read `.specs/registry.md` to find the spec with `active` status
 2. Load `.specs/specs/<id>/SPEC.md`
 3. Parse all phases and tasks
 4. Show detailed breakdown:

@@ -41,8 +41,7 @@ Specs live in `.specs/` at your project root — plain markdown with YAML frontm
 
 ```
 .specs/
-├── active                          # Which spec is active (plain text)
-├── registry.md                     # Index of all specs
+├── registry.md                     # Index of all specs (source of truth for status)
 ├── research/
 │   └── user-auth-system/
 │       ├── research-01.md          # Initial codebase + web research
@@ -74,20 +73,20 @@ Add JWT-based authentication with OAuth (Google, GitHub) to the Express
 API. Uses the existing middleware pattern in src/middleware/.
 
 ## Phase 1: Foundation [completed]
-- [x] Set up auth middleware in src/middleware/auth.ts
-- [x] Create User model with Prisma schema
-- [x] Implement JWT generation and verification in src/auth/tokens.ts
-- [x] Add refresh token rotation
+- [x] [AUTH-01] Set up auth middleware in src/middleware/auth.ts
+- [x] [AUTH-02] Create User model with Prisma schema
+- [x] [AUTH-03] Implement JWT generation and verification in src/auth/tokens.ts
+- [x] [AUTH-04] Add refresh token rotation
 
 ## Phase 2: OAuth Integration [in-progress]
-- [x] Google OAuth provider
-- [ ] GitHub OAuth provider ← current
-- [ ] Token exchange flow for both providers
+- [x] [AUTH-05] Google OAuth provider
+- [ ] [AUTH-06] GitHub OAuth provider ← current
+- [ ] [AUTH-07] Token exchange flow for both providers
 
 ## Phase 3: Testing & Hardening [pending]
-- [ ] Unit tests for auth middleware
-- [ ] Integration tests for OAuth flow
-- [ ] Rate limiting on auth endpoints
+- [ ] [AUTH-08] Unit tests for auth middleware
+- [ ] [AUTH-09] Integration tests for OAuth flow
+- [ ] [AUTH-10] Rate limiting on auth endpoints
 
 ---
 
@@ -105,6 +104,11 @@ API. Uses the existing middleware pattern in src/middleware/.
 | 2026-02-10 | JWT over sessions | Stateless, scales for microservices |
 | 2026-02-10 | Refresh token rotation | Limits damage from stolen tokens |
 | 2026-02-11 | Prisma over raw SQL | Already used in the project for other models |
+
+## Deviations
+| Task | Spec Said | Actually Did | Why |
+|------|-----------|-------------|-----|
+| AUTH-05 | Use passport.js | Direct googleapis calls | Simpler for a single provider, avoids passport session overhead |
 ```
 
 ## Installation
@@ -145,8 +149,9 @@ npx skills add ngvoicu/specsmith-forge -a codex
 # Cursor
 npx skills add ngvoicu/specsmith-forge -a cursor
 
-# Windsurf
+# Windsurf (see Windsurf Note below)
 npx skills add ngvoicu/specsmith-forge -a windsurf
+rm .windsurf/skills/spec-smith && cp -r .agents/skills/spec-smith .windsurf/skills/spec-smith
 
 # Cline
 npx skills add ngvoicu/specsmith-forge -a cline
@@ -158,6 +163,18 @@ npx skills add ngvoicu/specsmith-forge -a gemini
 For Claude Code, this installs SKILL.md with auto-triggers ("resume", "what was I working on", "create a spec for X"). You **don't** get slash commands, the researcher agent, or hooks — use Path 1 for the full plugin.
 
 For other tools, this installs the SKILL.md which teaches the tool the full spec workflow — session start detection, resuming, pausing, creating specs, updating progress, and cross-session continuity.
+
+#### Windsurf Note
+
+`npx skills add -a windsurf` creates a symlink that Windsurf Cascade doesn't follow. After installing, replace the symlink with a real copy:
+
+```bash
+npx skills add ngvoicu/specsmith-forge -a windsurf
+rm .windsurf/skills/spec-smith
+cp -r .agents/skills/spec-smith .windsurf/skills/spec-smith
+```
+
+Cascade will auto-activate the skill when your request matches the description, or you can invoke it manually with `@spec-smith`.
 
 ### Comparison: Plugin vs npx
 
@@ -208,15 +225,15 @@ Once configured via `npx skills add`, every tool understands the same spec lifec
 
 **Create a spec** — Ask the tool to plan or spec out work. It creates `.specs/specs/<id>/SPEC.md` with phases, tasks, a decision log, and resume context.
 
-**Resume** — The tool reads `.specs/active`, loads the SPEC.md, finds the `← current` task, reads the Resume Context section, and continues from exactly where you left off.
+**Resume** — The tool reads `.specs/registry.md` to find the active spec, loads the SPEC.md, finds the `← current` task, reads the Resume Context section, and continues from exactly where you left off.
 
 **Pause** — The tool captures current state into the Resume Context section: which files were modified (specific paths, function names), what was completed, the exact next step. Updates checkboxes, sets status to `paused`.
 
-**Switch** — The tool pauses the current spec (full pause), loads the target spec, writes its ID to `.specs/active`, and resumes it.
+**Switch** — The tool pauses the current spec (full pause), loads the target spec, sets it to `active` in the registry, and resumes it.
 
 **List** — The tool reads `.specs/registry.md` and shows specs grouped by status (active, paused, completed).
 
-**Complete** — The tool verifies all tasks are checked, sets status to `completed`, updates the registry, and clears `.specs/active`.
+**Complete** — The tool verifies all tasks are checked, sets status to `completed` in both the SPEC.md frontmatter and the registry.
 
 #### Tool-specific invocation examples
 
@@ -265,6 +282,7 @@ For manual setup, see the snippet format in [SKILL.md](SKILL.md).
 ### Cross-Tool Sync
 
 All tools share the same files:
+- **Task codes** — `[AUTH-03]` is the same task everywhere
 - **`← current` marker** — Every tool knows which task is next
 - **Resume Context** — Detailed state with file paths and function names
 - **Phase status markers** — `[pending]`, `[in-progress]`, `[completed]`, `[blocked]`
@@ -363,11 +381,13 @@ Full specification in [`references/spec-format.md`](references/spec-format.md).
 ### Conventions
 
 - **Phase markers**: `[pending]`, `[in-progress]`, `[completed]`, `[blocked]`
-- **Task checkboxes**: `- [ ]` unchecked, `- [x]` done
+- **Task codes**: `[PREFIX-NN]` — unique per task, auto-incrementing across phases
+- **Task checkboxes**: `- [ ] [AUTH-01]` unchecked, `- [x] [AUTH-01]` done
 - **Current task**: `← current` after the task text
-- **Uncertainty**: `[NEEDS CLARIFICATION]` prefix on unclear tasks
+- **Uncertainty**: `[NEEDS CLARIFICATION]` after the task code on unclear tasks
 - **Resume Context**: Blockquote with specific file paths, function names, exact next step
 - **Decision Log**: Table with date, decision, rationale
+- **Deviations**: Table tracking where implementation diverged from spec
 
 ## Why Not Just Use Plan Mode?
 

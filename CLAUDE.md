@@ -43,7 +43,7 @@ The plugin is consumed directly by Claude Code — no build step. Markdown files
 - **`commands/*.md`** — Each file is a slash command. Claude reads these as instructions.
 - **`agents/researcher.md`** — Subagent definition. Uses Opus model with Read, Glob, Grep, Bash, WebSearch, WebFetch, Task tools for exhaustive codebase analysis.
 - **`hooks/hooks.json`** — SessionStart hook with matcher (`startup|resume|clear|compact`) that runs `session-start.sh` via `${CLAUDE_PLUGIN_ROOT}`. Re-injects context after `/clear` and `/compact`.
-- **`hooks/session-start.sh`** — External script that reads `.specs/active` and the SPEC.md, parses title, status, priority, task counts, current phase/task, and resume context. Outputs a rich human-readable summary. Exits 0 silently when no active spec exists.
+- **`hooks/session-start.sh`** — External script that reads `.specs/registry.md` to find the active spec, then reads the SPEC.md and parses title, status, priority, task counts, current phase/task, and resume context. Outputs a rich human-readable summary. Exits 0 silently when no active spec exists.
 - **`SKILL.md`** — Universal skill with sections for all tools + Claude Code plugin section. Defines natural language triggers ("resume", "what was I working on", "create a spec for X") and session lifecycle behavior.
 
 ### Data Layer — `.specs/` Directory
@@ -52,8 +52,7 @@ Created in the project root. All tools (Claude Code, Codex, Cursor, etc.) share 
 
 ```
 .specs/
-├── active                  # Plain text file containing active spec ID
-├── registry.md             # Markdown table indexing all specs
+├── registry.md             # Markdown table indexing all specs (single source of truth for status)
 ├── research/<spec-id>/     # Research and interview artifacts
 │   ├── research-01.md
 │   ├── interview-01.md
@@ -71,7 +70,8 @@ Full spec in `references/spec-format.md`. Summary:
 - **Frontmatter**: YAML with `id`, `title`, `status`, `created`, `updated`, optional `priority` and `tags`
 - **Spec IDs**: Lowercase hyphenated slugs derived from titles (e.g., "User Auth System" → `user-auth-system`)
 - **Phase status markers**: `[pending]`, `[in-progress]`, `[completed]`, `[blocked]`
-- **Task markers**: `- [ ]` unchecked, `- [x]` done, `← current` marks the active task
+- **Task codes**: `[PREFIX-NN]` per task (e.g., `[AUTH-01]`), auto-incrementing across phases
+- **Task markers**: `- [ ] [AUTH-01]` unchecked, `- [x] [AUTH-01]` done, `← current` marks the active task
 - **Resume Context**: Blockquote with specific file paths, function names, exact next step
 - **Decision Log**: Markdown table with date, decision, rationale
 
@@ -100,3 +100,4 @@ Phases: `[pending]`, `[in-progress]`, `[completed]`, `[blocked]`
 - The Claude Code Plugin section in SKILL.md is tool-specific (~20 lines at the top)
 - All supported tools use `npx skills add` for setup
 - No build step — markdown files are consumed directly
+- Windsurf install copies SKILL.md directly to `.windsurf/skills/spec-smith/SKILL.md` (npx creates symlinks that Cascade doesn't follow, so users replace the symlink with a real copy)

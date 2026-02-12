@@ -9,7 +9,6 @@ Show all specs grouped by status.
 
 1. Read `.specs/registry.md`
 2. For each spec, also read the SPEC.md to get accurate task counts
-3. Read `.specs/active` to mark which one is active
 4. Present grouped by status:
 
 ```

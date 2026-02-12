@@ -195,7 +195,7 @@ Before writing the spec, ensure the directory structure exists:
    mkdir -p .specs/research/<spec-id>
    mkdir -p .specs/specs/<spec-id>
    ```
-3. If `.specs/` doesn't exist yet, also create `registry.md` and `active`
+3. If `.specs/` doesn't exist yet, also create `registry.md`
 
 If you were in plan mode during earlier phases, confirm the user has exited
 plan mode before proceeding. If directory creation fails (still read-only),
@@ -235,7 +235,7 @@ Save to:
 .specs/specs/<spec-id>/SPEC.md
 ```
 
-Update `.specs/registry.md` and `.specs/active`.
+Update `.specs/registry.md` (set status to `active`).
 
 **Present the spec to the user for review.** Walk through the phases and
 ask if the structure, sequencing, and task granularity look right. Adjust
@@ -249,11 +249,16 @@ Once the user approves the spec:
 2. Mark the first task with `← current`
 3. Begin implementing
 
-As you work:
-- Check off tasks when done
-- Move `← current` forward
+**After completing each task, immediately edit the SPEC.md file** — don't
+defer updates to the end of the session:
+- Check off the task: `- [ ]` -> `- [x]`
+- Move `← current` to the next unchecked task
+- When all tasks in a phase are done: `[in-progress]` -> `[completed]`, next phase `[pending]` -> `[in-progress]`
+- Update the `updated` date in frontmatter
+- Update progress (`X/Y`) and `updated` date in `.specs/registry.md`
 - Update Resume Context periodically
 - Log any new decisions in the Decision Log
+- If implementation diverges from the spec, log it in the **Deviations** section
 - If a task reveals unexpected complexity, split it and update the spec
 
 If the session is ending before the spec is complete, run the pause workflow
