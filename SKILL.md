@@ -7,6 +7,7 @@ description: >
   exits plan mode (automatically offer to save the plan as a spec), says
   "resume" or "what was I working on", wants to switch between projects,
   mentions specs/phases/tasks, says "spec new/list/resume/status/pause/activate",
+  says "forge", "research", "interview", "create a spec for X", "plan X",
   says "generate openapi", "update api spec", "create api docs", "openapi",
   or any workflow involving structured planning that should persist. Also
   trigger when the user starts a new session in a project that has a `.specs/`
@@ -156,26 +157,64 @@ changes that would surprise someone comparing the spec to the code.
 
 See `references/spec-format.md` for the full SPEC.md template.
 
-## Creating Specs
+## Forging Specs
 
-When asked to plan or spec out work:
+When asked to plan, spec out, or forge work, follow the full forge workflow:
+research deeply, interview the user, iterate until clear, then write the spec.
+
+### Step 1: Deep Research
+
+Scan the project and gather context before asking anything:
+
+- **Project structure**: Map directories, patterns, tech stack (read
+  package.json / Cargo.toml / go.mod / requirements.txt etc.)
+- **Related code**: Find every file, function, component, route, model, and
+  test that touches the area being changed. Read actual file contents.
+- **Patterns**: How does the codebase handle similar things? What conventions
+  exist for the area being modified?
+- **Dependencies**: Relevant libraries, version constraints, build/CI config
+- **Web research**: If the task involves unfamiliar tech or benefits from
+  current docs, search for best practices, API changes, known pitfalls
+
+Save findings to `.specs/research/<id>/research-01.md` with sections for
+architecture, relevant code, tech stack, external research, and open questions.
+
+### Step 2: Interview Round 1
+
+Present your findings and ask targeted questions. Your research should inform
+specific questions, not generic ones:
+
+1. **Summarize what you found** (2-3 paragraphs)
+2. **State assumptions** — "Based on the codebase, I'm assuming X because
+   that's what similar features use. Correct?"
+3. **Ask 3-6 specific questions** your research couldn't answer:
+   architecture decisions, scope boundaries, technical choices, edge cases
+4. **Propose a rough approach** and ask for reactions
+
+Save to `.specs/research/<id>/interview-01.md` with questions, answers,
+key decisions, and any new research needed.
+
+### Step 3: Iterate
+
+Based on the user's answers, do another round of research (save to
+`research-02.md`) then another interview (`interview-02.md`). Repeat until:
+
+- Every task in the spec can be described concretely (not "figure out X")
+- The user is satisfied with the direction
+- No ambiguity remains about scope, approach, or sequencing
+
+This may take 2 rounds or 5 rounds. Don't rush it.
+
+### Step 4: Setup
 
 1. Generate a spec ID from the title (lowercase, hyphenated):
    `"User Auth System"` -> `user-auth-system`
-2. Initialize `.specs/` if it doesn't exist:
+2. Initialize directories:
    ```bash
-   mkdir -p .specs/specs
+   mkdir -p .specs/research/<id>
+   mkdir -p .specs/specs/<id>
    ```
-3. Create `.specs/specs/<id>/SPEC.md` with:
-   - YAML frontmatter (id, title, status, created, updated, priority, tags)
-   - Overview section (2-4 sentences on what and why)
-   - Phases with status markers (3-6 phases is typical)
-   - Tasks as markdown checkboxes with task codes (`[PREFIX-NN]`)
-   - Resume Context section (blockquote)
-   - Decision Log table
-   - Deviations table (empty — filled during implementation)
-4. Update `.specs/registry.md` — set status to `active`. If creating for the
-   first time, initialize with:
+3. If `.specs/registry.md` doesn't exist, initialize it:
    ```markdown
    # Spec Registry
 
@@ -183,8 +222,30 @@ When asked to plan or spec out work:
    |----|-------|--------|----------|----------|---------|
    ```
 
-**Phase/task guidelines:**
+### Step 5: Write the Spec
+
+Synthesize all research notes, interview answers, and decisions into a
+SPEC.md. See `references/spec-format.md` for the full template. Include:
+
+- YAML frontmatter (id, title, status, created, updated, priority, tags)
+- Overview (2-4 sentences — someone reading just this should understand
+  what's being built and why)
+- Phases with status markers (3-6 phases is typical)
+- Tasks as markdown checkboxes with task codes (`[PREFIX-NN]`)
+- Resume Context section (blockquote)
+- Decision Log with every non-obvious choice from the interviews
+- Deviations table (empty — filled during implementation)
+
+**Quality check before presenting:**
+- Every task should be concrete ("Add verifyToken() to src/auth/tokens.ts"),
+  not vague ("implement token verification")
+- Phases should have clear boundaries and dependencies
 - Each task should be completable in roughly one focused session
+
+Save to `.specs/specs/<id>/SPEC.md`. Update `.specs/registry.md` — set
+status to `active`. Present the spec for review and adjust based on feedback.
+
+**Phase/task guidelines:**
 - Mark Phase 1 as `[in-progress]`, the rest as `[pending]`
 - Mark the first unchecked task with `← current`
 

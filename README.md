@@ -178,10 +178,10 @@ cp -r .agents/skills/specsmith .codeium/windsurf/skills/specsmith    # real copy
 
 **Windows (PowerShell):**
 ```powershell
-Remove-Item .windsurf\skills\specsmith                                # remove symlink
-Remove-Item .codeium\windsurf\skills\specsmith                                # remove symlink
-Copy-Item -Recurse .agents\skills\specsmith .windsurf\skills\specsmith  # real copy
-Copy-Item -Recurse .agents\skills\specsmith .codeium\windsurf\skills\specsmith
+Remove-Item .windsurf\skills\specsmith                                           # remove symlink
+Remove-Item .codeium\windsurf\skills\specsmith                                   # remove symlink
+Copy-Item -Recurse .agents\skills\specsmith .windsurf\skills\specsmith           # real copy
+Copy-Item -Recurse .agents\skills\specsmith .codeium\windsurf\skills\specsmith.  # real copy
 ```
 
 Cascade will auto-activate the skill when your request matches the description, or you can invoke it manually with `@specsmith`.
