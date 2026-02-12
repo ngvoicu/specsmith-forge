@@ -165,18 +165,23 @@ For other tools, this installs the SKILL.md which teaches the tool the full spec
 
 #### Windsurf Note
 
-`npx skills add -a windsurf` creates a symlink that Windsurf Cascade doesn't follow. After installing, replace the symlink with a real copy:
+`npx skills add -a windsurf` creates a symlink at `.windsurf/skills/specsmith` that Windsurf Cascade doesn't follow. After installing, replace it with real files and also copy to the Codeium path:
 
 **macOS / Linux:**
 ```bash
-rm .windsurf/skills/specsmith
-cp -r .agents/skills/specsmith .windsurf/skills/specsmith
+rm .windsurf/skills/specsmith                                        # remove symlink
+rm .codeium/windsurf/skills/specsmith                                # remove symlink
+
+cp -r .agents/skills/specsmith .windsurf/skills/specsmith            # real copy
+cp -r .agents/skills/specsmith .codeium/windsurf/skills/specsmith    # real copy
 ```
 
 **Windows (PowerShell):**
 ```powershell
-Remove-Item .windsurf\skills\specsmith
-Copy-Item -Recurse .agents\skills\specsmith .windsurf\skills\specsmith
+Remove-Item .windsurf\skills\specsmith                                # remove symlink
+Remove-Item .codeium\windsurf\skills\specsmith                                # remove symlink
+Copy-Item -Recurse .agents\skills\specsmith .windsurf\skills\specsmith  # real copy
+Copy-Item -Recurse .agents\skills\specsmith .codeium\windsurf\skills\specsmith
 ```
 
 Cascade will auto-activate the skill when your request matches the description, or you can invoke it manually with `@specsmith`.
