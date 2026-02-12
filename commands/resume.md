@@ -5,7 +5,7 @@ disable-model-invocation: true
 
 # Resume Spec
 
-Read the spec-smith skill and follow the "Resuming a Spec" workflow.
+Read the specsmith skill and follow the "Resuming a Spec" workflow.
 
 1. Read `.specs/registry.md` to find the spec with `active` status
 2. If none is active, show the user their specs so they can choose one
@@ -17,5 +17,5 @@ Read the spec-smith skill and follow the "Resuming a Spec" workflow.
    provide additional context
 8. Present a compact summary and begin working on the current task
 
-If there are no specs at all, suggest running `/spec-smith:forge` to
+If there are no specs at all, suggest running `/specsmith:forge` to
 create one.

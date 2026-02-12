@@ -1,5 +1,5 @@
 ---
-name: spec-smith
+name: specsmith
 description: >
   Structured spec management for AI coding workflows. Converts ephemeral
   plans into persistent, resumable specs with phases, tasks, and progress
@@ -22,8 +22,8 @@ with any AI coding tool that can read markdown.
 
 ## Claude Code Plugin
 
-If running as a Claude Code plugin, slash commands like `/spec-smith:forge`,
-`/spec-smith:resume`, `/spec-smith:pause` etc. are available. See the
+If running as a Claude Code plugin, slash commands like `/specsmith:forge`,
+`/specsmith:resume`, `/specsmith:pause` etc. are available. See the
 plugin's `commands/` directory for the full set. The `/forge` command
 replaces plan mode with deep research, iterative interviews, and spec
 writing.

@@ -12,7 +12,7 @@ SpecSmith Forge is a Claude Code plugin that replaces ephemeral AI coding plans 
 ```
 specsmith-forge/
 ├── .claude-plugin/          # Plugin metadata
-│   ├── plugin.json          # Name: spec-smith, version 0.2.0
+│   ├── plugin.json          # Name: specsmith, version 0.2.0
 │   └── marketplace.json     # Marketplace registration
 ├── commands/                # Plugin slash commands (markdown instructions)
 │   ├── forge.md             # /forge — research → interview → spec → implement
@@ -39,7 +39,7 @@ specsmith-forge/
 
 The plugin is consumed directly by Claude Code — no build step. Markdown files define behavior:
 
-- **`plugin.json`** — Plugin identity (name: `spec-smith`, version: `0.2.0`)
+- **`plugin.json`** — Plugin identity (name: `specsmith`, version: `0.2.0`)
 - **`commands/*.md`** — Each file is a slash command. Claude reads these as instructions.
 - **`agents/researcher.md`** — Subagent definition. Uses Opus model with Read, Glob, Grep, Bash, WebSearch, WebFetch, Task tools for exhaustive codebase analysis.
 - **`hooks/hooks.json`** — SessionStart hook with matcher (`startup|resume|clear|compact`) that runs `session-start.sh` via `${CLAUDE_PLUGIN_ROOT}`. Re-injects context after `/clear` and `/compact`.
@@ -100,4 +100,4 @@ Phases: `[pending]`, `[in-progress]`, `[completed]`, `[blocked]`
 - The Claude Code Plugin section in SKILL.md is tool-specific (~20 lines at the top)
 - All supported tools use `npx skills add` for setup
 - No build step — markdown files are consumed directly
-- Windsurf install copies SKILL.md directly to `.windsurf/skills/spec-smith/SKILL.md` (npx creates symlinks that Cascade doesn't follow, so users replace the symlink with a real copy)
+- Windsurf install copies SKILL.md directly to `.windsurf/skills/specsmith/SKILL.md` (npx creates symlinks that Cascade doesn't follow, so users replace the symlink with a real copy)

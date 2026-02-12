@@ -21,7 +21,7 @@ Spec Smith fixes all of this.
 
 ### The Forge Workflow
 
-Run `/spec-smith:forge "add user authentication with OAuth"` and Spec Smith takes over:
+Run `/specsmith:forge "add user authentication with OAuth"` and Spec Smith takes over:
 
 **1. Deep Research** — Exhaustive codebase scan (reads 10-20+ actual files, not just file names), web search for best practices, Context7 library docs, UI inspection if applicable. Everything saved to `.specs/research/<id>/research-01.md`.
 
@@ -122,17 +122,17 @@ Everything: all 7 slash commands (`/forge`, `/resume`, `/pause`, `/switch`, `/li
 ```bash
 # In Claude Code, run:
 /plugin marketplace add ngvoicu/specsmith-forge
-/plugin install spec-smith
+/plugin install specsmith
 ```
 
 Or manually:
 ```bash
-git clone https://github.com/ngvoicu/specsmith-forge.git ~/.claude/plugins/spec-smith
+git clone https://github.com/ngvoicu/specsmith-forge.git ~/.claude/plugins/specsmith
 ```
 
 After install, just run:
 ```
-/spec-smith:forge "add user authentication"
+/specsmith:forge "add user authentication"
 ```
 
 ### Path 2: Quick Setup via npx (Any Tool)
@@ -151,7 +151,7 @@ npx skills add ngvoicu/specsmith-forge -a cursor
 
 # Windsurf (see Windsurf Note below)
 npx skills add ngvoicu/specsmith-forge -a windsurf
-rm .windsurf/skills/spec-smith && cp -r .agents/skills/spec-smith .windsurf/skills/spec-smith
+rm .windsurf/skills/specsmith && cp -r .agents/skills/specsmith .windsurf/skills/specsmith
 
 # Cline
 npx skills add ngvoicu/specsmith-forge -a cline
@@ -170,11 +170,11 @@ For other tools, this installs the SKILL.md which teaches the tool the full spec
 
 ```bash
 npx skills add ngvoicu/specsmith-forge -a windsurf
-rm .windsurf/skills/spec-smith
-cp -r .agents/skills/spec-smith .windsurf/skills/spec-smith
+rm .windsurf/skills/specsmith
+cp -r .agents/skills/specsmith .windsurf/skills/specsmith
 ```
 
-Cascade will auto-activate the skill when your request matches the description, or you can invoke it manually with `@spec-smith`.
+Cascade will auto-activate the skill when your request matches the description, or you can invoke it manually with `@specsmith`.
 
 ### Comparison: Plugin vs npx
 
@@ -194,29 +194,29 @@ Cascade will auto-activate the skill when your request matches the description, 
 
 ```
 # Start a new spec with deep research
-/spec-smith:forge "add OAuth authentication"
+/specsmith:forge "add OAuth authentication"
 → Deep research (reads 10-20+ files, web search, library docs)
 → Interview rounds (targeted questions, not generic)
 → Writes SPEC.md with phases, tasks, decision log
 → Implements task by task
 
 # Generate OpenAPI spec from your codebase
-/spec-smith:openapi
+/specsmith:openapi
 → Scans routes, schemas, security config
 → Writes .openapi/openapi.yaml + per-endpoint docs
 
 # Session ends — save context
-/spec-smith:pause
+/specsmith:pause
 → Writes detailed resume context (file paths, function names, next step)
 
 # New session — pick up where you left off
-/spec-smith:resume
+/specsmith:resume
 → Reads resume context, continues from exact spot
 
 # Juggling features
-/spec-smith:list                    # See all specs
-/spec-smith:switch auth-system      # Pauses current, activates auth-system
-/spec-smith:status                  # Detailed progress
+/specsmith:list                    # See all specs
+/specsmith:switch auth-system      # Pauses current, activates auth-system
+/specsmith:status                  # Detailed progress
 ```
 
 ### Any Tool Flow (Codex, Cursor, Windsurf, Cline, Gemini CLI)

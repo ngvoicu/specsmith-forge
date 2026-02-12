@@ -23,4 +23,4 @@ Completed:
   ✓ ci-pipeline: CI Pipeline Setup (8/8 tasks) [high]
 ```
 
-If there are no specs, suggest running `/spec-smith:forge` to create one.
+If there are no specs, suggest running `/specsmith:forge` to create one.
