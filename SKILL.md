@@ -7,7 +7,7 @@ description: >
   exits plan mode (automatically offer to save the plan as a spec), says
   "resume" or "what was I working on", wants to switch between projects,
   mentions specs/phases/tasks, says "spec new/list/resume/status/pause/activate",
-  says "forge", "research", "interview", "create a spec for X", "plan X",
+  says "forge", "research", "create a spec for X", "plan X",
   says "generate openapi", "update api spec", "create api docs", "openapi",
   or any workflow involving structured planning that should persist. Also
   trigger when the user starts a new session in a project that has a `.specs/`
@@ -17,7 +17,7 @@ description: >
 # Spec Smith
 
 Turn ephemeral plans into structured, persistent specs built through deep
-research and iterative interviews. Specs have phases, tasks, resume context,
+research. Specs have phases, tasks, resume context,
 and a decision log. They live in `.specs/` at the project root and work
 with any AI coding tool that can read markdown.
 
@@ -160,7 +160,7 @@ See `references/spec-format.md` for the full SPEC.md template.
 ## Forging Specs
 
 When asked to plan, spec out, or forge work, follow the full forge workflow:
-research deeply, interview the user, iterate until clear, then write the spec.
+research deeply, then write the spec.
 
 ### Step 1: Deep Research
 
@@ -179,33 +179,7 @@ Scan the project and gather context before asking anything:
 Save findings to `.specs/research/<id>/research-01.md` with sections for
 architecture, relevant code, tech stack, external research, and open questions.
 
-### Step 2: Interview Round 1
-
-Present your findings and ask targeted questions. Your research should inform
-specific questions, not generic ones:
-
-1. **Summarize what you found** (2-3 paragraphs)
-2. **State assumptions** — "Based on the codebase, I'm assuming X because
-   that's what similar features use. Correct?"
-3. **Ask 3-6 specific questions** your research couldn't answer:
-   architecture decisions, scope boundaries, technical choices, edge cases
-4. **Propose a rough approach** and ask for reactions
-
-Save to `.specs/research/<id>/interview-01.md` with questions, answers,
-key decisions, and any new research needed.
-
-### Step 3: Iterate
-
-Based on the user's answers, do another round of research (save to
-`research-02.md`) then another interview (`interview-02.md`). Repeat until:
-
-- Every task in the spec can be described concretely (not "figure out X")
-- The user is satisfied with the direction
-- No ambiguity remains about scope, approach, or sequencing
-
-This may take 2 rounds or 5 rounds. Don't rush it.
-
-### Step 4: Setup
+### Step 2: Setup
 
 1. Generate a spec ID from the title (lowercase, hyphenated):
    `"User Auth System"` -> `user-auth-system`
@@ -222,9 +196,9 @@ This may take 2 rounds or 5 rounds. Don't rush it.
    |----|-------|--------|----------|----------|---------|
    ```
 
-### Step 5: Write the Spec
+### Step 3: Write the Spec
 
-Synthesize all research notes, interview answers, and decisions into a
+Synthesize all research notes and decisions into a
 SPEC.md. See `references/spec-format.md` for the full template. Include:
 
 - YAML frontmatter (id, title, status, created, updated, priority, tags)
@@ -233,7 +207,7 @@ SPEC.md. See `references/spec-format.md` for the full template. Include:
 - Phases with status markers (3-6 phases is typical)
 - Tasks as markdown checkboxes with task codes (`[PREFIX-NN]`)
 - Resume Context section (blockquote)
-- Decision Log with every non-obvious choice from the interviews
+- Decision Log with non-obvious technical choices
 - Deviations table (empty — filled during implementation)
 
 **Quality check before presenting:**
@@ -267,7 +241,6 @@ All state lives in `.specs/` at the project root:
 ├── research/
 │   └── <spec-id>/
 │       ├── research-01.md    # Deep research findings
-│       ├── interview-01.md   # Interview rounds
 │       └── ...
 └── specs/
     └── <spec-id>/
