@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# session-start.sh — Rich context injection for SpecSmith Forge
+# session-start.sh — Rich context injection for Spec Smith
 # Reads the registry to find the active spec and outputs a human-readable summary.
 # Called by hooks.json on SessionStart (startup, resume, clear, compact).
 # Exits 0 silently if no active spec exists.

@@ -320,7 +320,7 @@ read and write files can use these specs:
 - **Humans**: Readable and editable in any text editor
 - **Git**: Diffs cleanly, easy to track in version control
 
-To configure another tool, run `npx skills add ngvoicu/specsmith-forge -a <tool>`.
+To configure another tool, run `npx skills add ngvoicu/specsmith -a <tool>`.
 
 ## Behavioral Notes
 

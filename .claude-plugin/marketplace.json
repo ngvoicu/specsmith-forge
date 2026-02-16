@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "specsmith-forge",
+  "name": "specsmith",
   "owner": {
     "name": "Gabriel Voicu"
   },
