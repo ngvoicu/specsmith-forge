@@ -7,9 +7,14 @@ disable-model-invocation: true
 
 Show all specs grouped by status.
 
-1. Read `.specs/registry.md`
-2. For each spec, also read the SPEC.md to get accurate task counts
-4. Present grouped by status:
+1. If `.specs/registry.md` does not exist, report "No specs yet" and suggest
+   running `/specsmith:forge`.
+2. Read `.specs/registry.md`.
+3. For each spec row, read `.specs/<id>/SPEC.md` to compute accurate
+   task counts (`[x]` and total), current phase, and current task marker.
+4. Present grouped by status in this order: `active`, `paused`, `completed`,
+   `archived`. If a registry row points to a missing SPEC.md, show it under
+   the right status with `(SPEC.md missing)` and continue.
 
 ```
 Active:
@@ -23,4 +28,5 @@ Completed:
   ✓ ci-pipeline: CI Pipeline Setup (8/8 tasks) [high]
 ```
 
-If there are no specs, suggest running `/specsmith:forge` to create one.
+If there are no rows after the table header, suggest running
+`/specsmith:forge` to create one.

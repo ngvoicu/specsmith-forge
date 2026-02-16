@@ -11,7 +11,7 @@ Target: $ARGUMENTS
 
 1. **Pause current spec** — run the full pause workflow (save resume
    context, update checkboxes, set status to paused)
-2. **Load target spec** — read `.specs/specs/<target-id>/SPEC.md`
+2. **Load target spec** — read `.specs/<target-id>/SPEC.md`
 3. **Activate it** — set its status to `active` in both frontmatter and
    `.specs/registry.md`
 4. **Resume it** — run the full resume workflow (parse progress, find

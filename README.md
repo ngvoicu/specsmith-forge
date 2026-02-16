@@ -23,7 +23,7 @@ Spec Smith fixes all of this.
 
 Run `/specsmith:forge "add user authentication with OAuth"` and Spec Smith takes over:
 
-**1. Deep Research** — Exhaustive codebase scan (reads 10-20+ actual files, not just file names), web search for best practices, Context7 library docs, UI inspection if applicable. Everything saved to `.specs/research/<id>/research-01.md`.
+**1. Deep Research** — Exhaustive codebase scan (reads 10-20+ actual files, not just file names), web search for best practices, Context7 library docs, UI inspection if applicable. Everything saved to `.specs/<id>/research-01.md`.
 
 **2. Interview** — Presents findings, states assumptions, asks targeted questions informed by the research. Not generic questions — specific ones like "I see you're using Express middleware pattern X in `src/middleware/`. Should the auth middleware follow the same pattern?" Saves answers to `interview-01.md`.
 
@@ -41,17 +41,20 @@ Specs live in `.specs/` at your project root — plain markdown with YAML frontm
 
 ```
 .specs/
-├── registry.md                     # Index of all specs (source of truth for status)
-├── research/
-│   └── user-auth-system/
-│       ├── research-01.md          # Initial codebase + web research
-│       ├── interview-01.md         # First interview round
-│       ├── research-02.md          # Follow-up research
-│       └── interview-02.md         # Second interview round
-└── specs/
-    └── user-auth-system/
-        └── SPEC.md                 # The spec document
+├── registry.md                     # Denormalized index for status/progress lookups
+└── user-auth-system/
+    ├── SPEC.md                     # The spec document
+    ├── research-01.md              # Initial codebase + web research
+    ├── interview-01.md             # First interview round
+    ├── research-02.md              # Follow-up research
+    └── interview-02.md             # Second interview round
 ```
+
+**SPEC.md frontmatter is authoritative.** `.specs/registry.md` is a
+denormalized index for quick lookups.
+
+For this `specsmith` repository, `.specs/` is intentionally gitignored for
+local dogfooding. In consumer projects, you can choose to commit `.specs/`.
 
 ### A SPEC.md Looks Like This
 
@@ -117,7 +120,7 @@ Two ways to use Spec Smith, depending on your setup.
 
 ### Path 1: Claude Code Plugin (Full — Recommended)
 
-Everything: all 7 slash commands (`/forge`, `/resume`, `/pause`, `/switch`, `/list`, `/status`, `/openapi`), researcher agent (Opus-powered deep codebase analysis), session start hooks, SKILL.md auto-triggers.
+Everything: all 7 slash commands (`/forge`, `/resume`, `/pause`, `/switch`, `/list`, `/status`, `/openapi`), researcher agent (Opus-powered deep codebase analysis), and SKILL.md auto-triggers.
 
 ```bash
 # In Claude Code, run:
@@ -159,9 +162,9 @@ npx skills add ngvoicu/specsmith -a cline
 npx skills add ngvoicu/specsmith -a gemini
 ```
 
-For Claude Code, this installs SKILL.md with auto-triggers ("resume", "what was I working on", "create a spec for X"). You **don't** get slash commands, the researcher agent, or hooks — use Path 1 for the full plugin.
+For Claude Code, this installs SKILL.md with auto-triggers ("resume", "what was I working on", "create a spec for X"). You **don't** get slash commands or the researcher agent — use Path 1 for the full plugin.
 
-For other tools, this installs the SKILL.md which teaches the tool the full spec workflow — session start detection, resuming, pausing, creating specs, updating progress, and cross-session continuity.
+For other tools, this installs the SKILL.md which teaches the tool the full spec workflow — resuming, pausing, creating specs, updating progress, and cross-session continuity.
 
 #### Windsurf Note
 
@@ -193,7 +196,6 @@ Cascade will auto-activate the skill when your request matches the description, 
 | `/forge` research-interview workflow | Yes | No |
 | `/resume`, `/pause`, `/switch` commands | Yes | No |
 | Researcher subagent (Opus, deep analysis) | Yes | No |
-| Session start hook (detects active spec) | Yes | No |
 | Auto-triggers (Claude Code only) | Yes | Yes |
 | Works with Codex, Cursor, Windsurf, etc. | No | Yes |
 | Multi-tool `.specs/` compatibility | Yes | Yes |
@@ -233,7 +235,7 @@ Cascade will auto-activate the skill when your request matches the description, 
 
 Once configured via `npx skills add`, every tool understands the same spec lifecycle. Here's the complete workflow:
 
-**Create a spec** — Ask the tool to plan or spec out work. It creates `.specs/specs/<id>/SPEC.md` with phases, tasks, a decision log, and resume context.
+**Create a spec** — Ask the tool to plan or spec out work. It creates `.specs/<id>/SPEC.md` with phases, tasks, a decision log, and resume context.
 
 **Resume** — The tool reads `.specs/registry.md` to find the active spec, loads the SPEC.md, finds the `← current` task, reads the Resume Context section, and continues from exactly where you left off.
 
@@ -305,7 +307,7 @@ All tools share the same files:
 
 Not a quick scan. The researcher reads 10-20+ files, following dependency chains, checking tests, examining config. Also runs web searches for best practices, pulls library docs via Context7.
 
-Output saved to `.specs/research/<id>/research-01.md`. Covers:
+Output saved to `.specs/<id>/research-01.md`. Covers:
 - Project architecture and directory structure
 - Every file touching the area of change
 - Tech stack versions (from lock files, not guesses)
@@ -364,8 +366,6 @@ specsmith/
 │   └── openapi.md                  # Generate OpenAPI spec from codebase
 ├── agents/
 │   └── researcher.md               # Deep research subagent (Opus)
-├── hooks/
-│   └── hooks.json                  # SessionStart detection
 ├── references/
 │   └── spec-format.md              # SPEC.md format specification
 ├── SKILL.md                        # Universal skill (works with all tools)

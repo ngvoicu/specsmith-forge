@@ -7,10 +7,17 @@ disable-model-invocation: true
 
 Show detailed progress of the active spec.
 
-1. Read `.specs/registry.md` to find the spec with `active` status
-2. Load `.specs/specs/<id>/SPEC.md`
-3. Parse all phases and tasks
-4. Show detailed breakdown:
+1. If `.specs/registry.md` does not exist, report "No specs yet" and suggest
+   running `/specsmith:forge`.
+2. Read `.specs/registry.md` and find the spec with `active` status.
+3. If no active spec exists:
+   - If specs exist, list them and ask which one to activate.
+   - If no specs exist, suggest running `/specsmith:forge`.
+4. Load `.specs/<id>/SPEC.md` for the active spec and parse all phases
+   and tasks.
+5. Show a detailed breakdown with explicit markers (`✓` done, `→` in-progress,
+   `○` pending), plus exact progress (`X/Y` tasks), current phase, and current
+   task.
 
 ```
 User Auth System [active, high priority]
@@ -36,5 +43,6 @@ Progress: 5/10 tasks (50%)
 Current: GitHub OAuth provider
 ```
 
-4. Also show the Resume Context section
-5. If there are research notes in `.specs/research/<id>/`, mention them
+6. Also show the Resume Context section.
+7. If there are research notes (research-*.md, interview-*.md) in
+   `.specs/<id>/`, mention them with file count.

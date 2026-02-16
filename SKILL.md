@@ -21,6 +21,22 @@ research. Specs have phases, tasks, resume context,
 and a decision log. They live in `.specs/` at the project root and work
 with any AI coding tool that can read markdown.
 
+Whether `.specs/` is committed is repository policy. Respect `.gitignore`
+and the user's preference for tracked vs local-only spec state.
+
+## Critical Invariants
+
+1. **Single-file policy**: Keep this workflow in one `SKILL.md` file.
+2. **Canonical paths**:
+   - Registry: `.specs/registry.md`
+   - Per-spec files: `.specs/<id>/SPEC.md`, `.specs/<id>/research-*.md`,
+     `.specs/<id>/interview-*.md`
+3. **Authority rule**: `SPEC.md` frontmatter is authoritative. Registry is a
+   denormalized index for quick lookup.
+4. **Active-spec rule**: Target exactly one active spec at a time.
+5. **Parser policy**: Use best-effort parsing with clear warnings and repair
+   guidance instead of hard failure on malformed rows.
+
 ## Claude Code Plugin
 
 If running as a Claude Code plugin, slash commands like `/specsmith:forge`,
@@ -31,7 +47,7 @@ writing.
 
 ## Session Start
 
-If active-spec context was injected by a session hook, use it directly
+If active-spec context was injected by host tooling, use it directly
 instead of reading files. Otherwise, fall back to reading files manually:
 
 1. Read `.specs/registry.md` to check for a spec with `active` status
@@ -40,6 +56,17 @@ instead of reading files. Otherwise, fall back to reading files manually:
    Say 'resume' to pick up where you left off."
 3. Don't force it — the user might want to do something else first
 
+## Deterministic Edge Cases (Best-Effort)
+
+| Situation | Required behavior |
+|-----------|-------------------|
+| `.specs/registry.md` missing | If `.specs/` exists, report "No registry yet" and offer to initialize it. If `.specs/` is missing, report "No specs yet" and continue normally. |
+| Malformed registry row | Skip malformed row, emit warning with row text, continue parsing remaining rows. |
+| Multiple `active` rows | Warn user. Pick the row with the newest `Updated` date (or first active row if dates are unavailable) for this run. On next write, normalize to a single active spec. |
+| Registry row exists but `.specs/<id>/SPEC.md` missing | Warn and continue. Keep row visible in list/status with `(SPEC.md missing)`. |
+| Registry and SPEC conflict | Trust `SPEC.md`, then repair registry values on next write. |
+| No active spec | List available specs and ask which to activate or resume. |
+
 ## Working on a Spec
 
 ### Resuming
@@ -47,7 +74,7 @@ instead of reading files. Otherwise, fall back to reading files manually:
 When the user says "resume", "what was I working on", or similar:
 
 1. Read `.specs/registry.md` — find the spec with `active` status. If none, list specs and ask which to resume
-2. Load `.specs/specs/<id>/SPEC.md`
+2. Load `.specs/<id>/SPEC.md`
 3. Parse progress:
    - Count completed `[x]` vs total tasks per phase
    - Find current phase (first `[in-progress]` phase)
@@ -79,6 +106,14 @@ spec as you go:
    - Next phase: `[pending]` -> `[in-progress]`
 4. Update the `updated` date in YAML frontmatter
 5. Update progress (`X/Y`) and `updated` date in `.specs/registry.md`
+
+**Update transaction (required order):**
+1. Update `SPEC.md` first (status/task/phase/resume context).
+2. Recompute progress directly from `SPEC.md` checkboxes.
+3. Update the matching registry row (status/progress/updated).
+4. Re-read both files to verify consistency.
+5. If registry update fails, keep `SPEC.md` as source of truth and emit a
+   warning with exact repair action for `.specs/registry.md`.
 
 Also:
 - If a task is more complex than expected, split it into subtasks
@@ -115,7 +150,15 @@ hooked up to the `/auth/refresh` endpoint yet."
 1. Pause the current spec (full pause workflow)
 2. Load the target spec
 3. Set target status to `active` in its frontmatter and in `.specs/registry.md`
-5. Resume the target spec (full resume workflow)
+4. Resume the target spec (full resume workflow)
+
+## Command Ownership Map
+
+- `SKILL.md`: global invariants, lifecycle rules, state authority, and conflict
+  handling.
+- `commands/*.md`: command-specific entrypoints, prompts, and output shapes.
+- If there is a conflict, preserve `Critical Invariants` from this file and
+  apply command-specific behavior only where it does not violate invariants.
 
 ## Spec Format
 
@@ -176,7 +219,7 @@ Scan the project and gather context before asking anything:
 - **Web research**: If the task involves unfamiliar tech or benefits from
   current docs, search for best practices, API changes, known pitfalls
 
-Save findings to `.specs/research/<id>/research-01.md` with sections for
+Save findings to `.specs/<id>/research-01.md` with sections for
 architecture, relevant code, tech stack, external research, and open questions.
 
 ### Step 2: Setup
@@ -185,8 +228,7 @@ architecture, relevant code, tech stack, external research, and open questions.
    `"User Auth System"` -> `user-auth-system`
 2. Initialize directories:
    ```bash
-   mkdir -p .specs/research/<id>
-   mkdir -p .specs/specs/<id>
+   mkdir -p .specs/<id>
    ```
 3. If `.specs/registry.md` doesn't exist, initialize it:
    ```markdown
@@ -216,7 +258,7 @@ SPEC.md. See `references/spec-format.md` for the full template. Include:
 - Phases should have clear boundaries and dependencies
 - Each task should be completable in roughly one focused session
 
-Save to `.specs/specs/<id>/SPEC.md`. Update `.specs/registry.md` — set
+Save to `.specs/<id>/SPEC.md`. Update `.specs/registry.md` — set
 status to `active`. Present the spec for review and adjust based on feedback.
 
 **Phase/task guidelines:**
@@ -237,14 +279,12 @@ All state lives in `.specs/` at the project root:
 
 ```
 .specs/
-├── registry.md               # Table of all specs with status (single source of truth)
-├── research/
-│   └── <spec-id>/
-│       ├── research-01.md    # Deep research findings
-│       └── ...
-└── specs/
-    └── <spec-id>/
-        └── SPEC.md           # The spec document
+├── registry.md               # Denormalized index for status/progress lookups
+└── <spec-id>/
+    ├── SPEC.md               # The spec document
+    ├── research-01.md        # Deep research findings
+    ├── interview-01.md       # Interview notes
+    └── ...
 ```
 
 ## Registry Format
@@ -280,6 +320,38 @@ Completed:
   ok ci-pipeline: CI Pipeline Setup (8/8 tasks)
 ```
 
+## Canonical Output Templates
+
+Use these concise formats consistently:
+
+**Resume**
+```
+Resuming: <Title> (<id>)
+Progress: <done>/<total> tasks
+Phase: <phase name>
+Current: <task text>
+Context: <one to three lines from Resume Context>
+```
+
+**List**
+```
+Active:
+  -> <id>: <Title> (<done>/<total>, <phase>) [<priority>]
+Paused:
+  || <id>: <Title> (<done>/<total>, <phase>) [<priority>]
+Completed:
+  ok <id>: <Title> (<done>/<total>) [<priority>]
+```
+
+**Status**
+```
+<Title> [<status>, <priority>]
+Created: <date> | Updated: <date>
+Phase <n>: <name> [<marker>]
+Progress: <done>/<total> (<pct>%)
+Current: <task text or none>
+```
+
 ## Completing a Spec
 
 1. Verify all tasks are checked (warn if not, but allow override)
@@ -292,7 +364,7 @@ Completed:
 Archive completed specs to keep the registry clean:
 
 1. Set status to `archived` in frontmatter and registry
-2. Research files in `.specs/research/<id>/` can optionally be deleted
+2. Research files (research-*.md, interview-*.md) in `.specs/<id>/` can optionally be deleted
    (the SPEC.md has all the decisions and context)
 
 Specs can be archived from `completed` or `paused` status. To reactivate
@@ -302,9 +374,8 @@ an archived spec, set its status back to `active`.
 
 To remove a spec entirely:
 
-1. Delete `.specs/specs/<id>/` (the SPEC.md)
-2. Delete `.specs/research/<id>/` if it exists
-3. Remove the row from `.specs/registry.md`
+1. Delete `.specs/<id>/` (contains SPEC.md, research notes, interviews)
+2. Remove the row from `.specs/registry.md`
 
 This is irreversible — consider archiving instead if you might need it later.
 

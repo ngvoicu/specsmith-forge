@@ -76,7 +76,7 @@ If the project has a UI and the changes affect it:
 
 Write everything you found to:
 ```
-.specs/research/<spec-id>/research-01.md
+.specs/<spec-id>/research-01.md
 ```
 
 Structure it clearly:
@@ -129,7 +129,7 @@ Keep it to 3-6 questions max per round. More than that overwhelms.
 
 **Save the interview:**
 ```
-.specs/research/<spec-id>/interview-01.md
+.specs/<spec-id>/interview-01.md
 ```
 
 ```markdown
@@ -161,7 +161,7 @@ Based on the user's answers, do another round of research:
 
 Save to:
 ```
-.specs/research/<spec-id>/research-02.md
+.specs/<spec-id>/research-02.md
 ```
 
 ## Phase 4: Interview Round 2+
@@ -192,8 +192,7 @@ Before writing the spec, ensure the directory structure exists:
 1. Generate a spec ID from the user's request (lowercase, hyphenated)
 2. Create the research directory:
    ```
-   mkdir -p .specs/research/<spec-id>
-   mkdir -p .specs/specs/<spec-id>
+   mkdir -p .specs/<spec-id>
    ```
 3. If `.specs/` doesn't exist yet, also create `registry.md`
 
@@ -232,7 +231,7 @@ spec should include:
 
 Save to:
 ```
-.specs/specs/<spec-id>/SPEC.md
+.specs/<spec-id>/SPEC.md
 ```
 
 Update `.specs/registry.md` (set status to `active`).
