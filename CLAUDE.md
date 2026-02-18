@@ -26,6 +26,9 @@ specsmith/
 │   └── researcher.md        # Deep research subagent (opus model)
 ├── references/
 │   └── spec-format.md       # Complete SPEC.md format specification
+├── skills/
+│   └── specsmith/
+│       └── SKILL.md         # → ../../SKILL.md (symlink for Claude Code plugin discovery)
 ├── SKILL.md                 # Universal skill definition (works with all tools)
 └── README.md
 ```

@@ -52,6 +52,10 @@ file names. Open 10-20 files if needed. If Context7 is available
 (resolve-library-id / get-library-docs tools), use it to pull documentation
 for key libraries.
 
+For large or unfamiliar codebases, spawn the `specsmith:researcher` agent
+(Task tool) to run an exhaustive parallel research pass. It will save
+structured findings to `.specs/<id>/research-01.md`.
+
 ### 1b. Web Research
 
 If the task involves technologies, patterns, or approaches that benefit from
